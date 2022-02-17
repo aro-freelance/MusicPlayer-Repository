@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#404040</color>
+    <color name="colorPrimaryDark">#333333</color>
+    <color name="colorAccent">#7298d4</color>
+    <color name="music_border_item">#041b40</color>
+    <color name="card_view_background">#022254</color> //4d4d4d
+    <color name="background">#55729e</color> //163570
+    <color name="comp_gold">#d4ae72</color>
+    <color name="triadic_lime">#98d472</color>
+</resources>
