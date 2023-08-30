@@ -5,21 +5,32 @@ import android.database.Cursor
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
-import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.provider.MediaStore
 import android.view.WindowManager
-import androidx.core.app.ActivityCompat
-import androidx.recyclerview.widget.LinearLayoutManager
 import android.widget.SeekBar
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.res.ResourcesCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.activity_music_player.*
+
+//TODO: replace this with working references to the views
+//import kotlinx.android.synthetic.main.activity_music_player.card_view
+//import kotlinx.android.synthetic.main.activity_music_player.next_button
+//import kotlinx.android.synthetic.main.activity_music_player.play_button
+//import kotlinx.android.synthetic.main.activity_music_player.previous_button
+//import kotlinx.android.synthetic.main.activity_music_player.recycler_view
+//import kotlinx.android.synthetic.main.activity_music_player.seek_bar
+//import kotlinx.android.synthetic.main.activity_music_player.shuffle_button
+//import kotlinx.android.synthetic.main.activity_music_player.song_title_text_view_in_card_view
+//import kotlinx.android.synthetic.main.activity_music_player.time_elapsed_text_view
+//import kotlinx.android.synthetic.main.activity_music_player.time_remaining_text_view
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
@@ -51,6 +62,7 @@ class MusicPlayerActivity : AppCompatActivity(), ItemClicked {
     private lateinit var linearLayoutManager : LinearLayoutManager
     private lateinit var adapter : MusicListAdapter
     private lateinit var mAdView : AdView
+
     private var currPosition : Int = 0
     private var isPlaying = false
     private var isShuffling = false
@@ -79,13 +91,10 @@ class MusicPlayerActivity : AppCompatActivity(), ItemClicked {
 
 
 
-
-        if(Build.VERSION.SDK_INT >= 23) {
-            checkPermissions()
-        }
+        checkPermissions()
 
         //don't let screen go to sleep. going to sleep mid-song is bad UX
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         play_button.setOnClickListener { play(currPosition) }
 
@@ -148,7 +157,7 @@ class MusicPlayerActivity : AppCompatActivity(), ItemClicked {
             mediaPlayer?.stop()
             isPlaying = false
             songPercent = 0
-            play_button.setImageDrawable(resources.getDrawable(R.drawable.ic_play_arrow, null))
+            play_button.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_play_arrow, null))
             song_title_text_view_in_card_view.text = " "
         }
     }
@@ -157,7 +166,7 @@ class MusicPlayerActivity : AppCompatActivity(), ItemClicked {
         if(mediaPlayer != null){
             mediaPlayer?.pause()
             isPlaying = false
-            play_button.setImageDrawable(resources.getDrawable(R.drawable.ic_play_arrow, null))
+            play_button.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_play_arrow, null))
 
         }
     }
@@ -169,11 +178,11 @@ class MusicPlayerActivity : AppCompatActivity(), ItemClicked {
         //toggle shuffle
 
         if(!isShuffling){
-            shuffle_button.setImageDrawable(resources.getDrawable(R.drawable.ic_shuffle_on, null))
+            shuffle_button.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_shuffle_on, null))
             isShuffling= true
         }
         else{
-            shuffle_button.setImageDrawable(resources.getDrawable(R.drawable.ic_shuffle, null))
+            shuffle_button.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_shuffle, null))
             isShuffling= false
         }
 
@@ -195,7 +204,7 @@ class MusicPlayerActivity : AppCompatActivity(), ItemClicked {
         //if it is not currently playing and not midway through a song
         if(!isPlaying && songPercent == 0){
 
-            play_button.setImageDrawable(resources.getDrawable(R.drawable.ic_pause, null))
+            play_button.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null))
             isPlaying = true
 
             if(isShuffling){
@@ -226,8 +235,8 @@ class MusicPlayerActivity : AppCompatActivity(), ItemClicked {
             if(mediaPlayer != null){
                 this@MusicPlayerActivity.runOnUiThread(object : Runnable{
                     override fun run() {
-                        var playerPosition = mediaPlayer?.currentPosition!! / 1000
-                        var totalDuration = mediaPlayer?.duration!! / 1000
+                        val playerPosition = mediaPlayer?.currentPosition!! / 1000
+                        val totalDuration = mediaPlayer?.duration!! / 1000
 
                         seek_bar.max = totalDuration
                         seek_bar.progress = playerPosition
@@ -250,7 +259,8 @@ class MusicPlayerActivity : AppCompatActivity(), ItemClicked {
         }
         //if it is paused midway through a song
         else if(!isPlaying && songPercent > 0){
-            play_button.setImageDrawable(resources.getDrawable(R.drawable.ic_pause, null))
+            //resources.getDrawable(R.drawable.ic_pause, null
+            play_button.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null))
             isPlaying = true
 
             //pause keeps the position in the player so we can just start
