@@ -1,5 +1,6 @@
 package com.aro.musicplayer
 
+
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.media.AudioAttributes
@@ -10,27 +11,19 @@ import android.os.Handler
 import android.provider.MediaStore
 import android.view.WindowManager
 import android.widget.SeekBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
-
-//TODO: replace this with working references to the views
-//import kotlinx.android.synthetic.main.activity_music_player.card_view
-//import kotlinx.android.synthetic.main.activity_music_player.next_button
-//import kotlinx.android.synthetic.main.activity_music_player.play_button
-//import kotlinx.android.synthetic.main.activity_music_player.previous_button
-//import kotlinx.android.synthetic.main.activity_music_player.recycler_view
-//import kotlinx.android.synthetic.main.activity_music_player.seek_bar
-//import kotlinx.android.synthetic.main.activity_music_player.shuffle_button
-//import kotlinx.android.synthetic.main.activity_music_player.song_title_text_view_in_card_view
-//import kotlinx.android.synthetic.main.activity_music_player.time_elapsed_text_view
-//import kotlinx.android.synthetic.main.activity_music_player.time_remaining_text_view
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
@@ -39,8 +32,6 @@ class MusicPlayerActivity : AppCompatActivity(), ItemClicked {
     /*
   Music app populates with all music from external storage.
 
-  //todo
-      update the app id and ad id (in manifest and in layout xml ad view
 
    */
 
@@ -62,6 +53,16 @@ class MusicPlayerActivity : AppCompatActivity(), ItemClicked {
     private lateinit var linearLayoutManager : LinearLayoutManager
     private lateinit var adapter : MusicListAdapter
     private lateinit var mAdView : AdView
+    private lateinit var playButton : FloatingActionButton
+    private lateinit var nextButton : FloatingActionButton
+    private lateinit var previousButton : FloatingActionButton
+    private lateinit var shuffleButton : FloatingActionButton
+    private lateinit var seekbar : SeekBar
+    private lateinit var songTitleTextViewInCardView : TextView
+    private lateinit var timeElapsedTextView : TextView
+    private lateinit var timeRemainingTextView : TextView
+    private lateinit var recyclerView : RecyclerView
+    private lateinit var cardView : CardView
 
     private var currPosition : Int = 0
     private var isPlaying = false
@@ -89,24 +90,35 @@ class MusicPlayerActivity : AppCompatActivity(), ItemClicked {
         mAdView = findViewById(R.id.ad_view)
         mAdView.loadAd(adRequest)
 
+        playButton = findViewById(R.id.play_button)
+        nextButton = findViewById(R.id.next_button)
+        previousButton = findViewById(R.id.previous_button)
+        shuffleButton = findViewById(R.id.shuffle_button)
+        seekbar = findViewById(R.id.seek_bar)
 
+        songTitleTextViewInCardView = findViewById(R.id.song_title_text_view_in_card_view)
+        timeElapsedTextView = findViewById(R.id.time_elapsed_text_view)
+        timeRemainingTextView = findViewById(R.id.time_remaining_text_view)
+
+        recyclerView = findViewById(R.id.recycler_view)
+        cardView = findViewById(R.id.card_view)
 
         checkPermissions()
 
         //don't let screen go to sleep. going to sleep mid-song is bad UX
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        play_button.setOnClickListener { play(currPosition) }
+        playButton.setOnClickListener { play(currPosition) }
 
-        next_button.setOnClickListener { next() }
+        nextButton.setOnClickListener { next() }
 
-        previous_button.setOnClickListener { previous() }
+        previousButton.setOnClickListener { previous() }
 
-        shuffle_button.setOnClickListener { shufflePlay() }
+        shuffleButton.setOnClickListener { shufflePlay() }
 
 
 
-        seek_bar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+        seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser){
                     if(mediaPlayer != null){
@@ -157,8 +169,8 @@ class MusicPlayerActivity : AppCompatActivity(), ItemClicked {
             mediaPlayer?.stop()
             isPlaying = false
             songPercent = 0
-            play_button.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_play_arrow, null))
-            song_title_text_view_in_card_view.text = " "
+            playButton.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_play_arrow, null))
+            songTitleTextViewInCardView.text = " "
         }
     }
 
@@ -166,7 +178,7 @@ class MusicPlayerActivity : AppCompatActivity(), ItemClicked {
         if(mediaPlayer != null){
             mediaPlayer?.pause()
             isPlaying = false
-            play_button.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_play_arrow, null))
+            playButton.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_play_arrow, null))
 
         }
     }
@@ -178,11 +190,11 @@ class MusicPlayerActivity : AppCompatActivity(), ItemClicked {
         //toggle shuffle
 
         if(!isShuffling){
-            shuffle_button.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_shuffle_on, null))
+            shuffleButton.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_shuffle_on, null))
             isShuffling= true
         }
         else{
-            shuffle_button.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_shuffle, null))
+            shuffleButton.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_shuffle, null))
             isShuffling= false
         }
 
@@ -204,7 +216,7 @@ class MusicPlayerActivity : AppCompatActivity(), ItemClicked {
         //if it is not currently playing and not midway through a song
         if(!isPlaying && songPercent == 0){
 
-            play_button.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null))
+            playButton.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null))
             isPlaying = true
 
             if(isShuffling){
@@ -225,7 +237,7 @@ class MusicPlayerActivity : AppCompatActivity(), ItemClicked {
                 prepare()
                 start()
 
-                song_title_text_view_in_card_view.text = musicList[position].songName
+                songTitleTextViewInCardView.text = musicList[position].songName
 
             }
 
@@ -238,12 +250,12 @@ class MusicPlayerActivity : AppCompatActivity(), ItemClicked {
                         val playerPosition = mediaPlayer?.currentPosition!! / 1000
                         val totalDuration = mediaPlayer?.duration!! / 1000
 
-                        seek_bar.max = totalDuration
-                        seek_bar.progress = playerPosition
+                        seekbar.max = totalDuration
+                        seekbar.progress = playerPosition
 
 
-                        time_elapsed_text_view.text = timerFormat(playerPosition.toLong())
-                        time_remaining_text_view.text = timerFormat((totalDuration - playerPosition).toLong())
+                        timeElapsedTextView.text = timerFormat(playerPosition.toLong())
+                        timeRemainingTextView.text = timerFormat((totalDuration - playerPosition).toLong())
 
                         mHandler.postDelayed(this, 1000)
 
@@ -260,7 +272,7 @@ class MusicPlayerActivity : AppCompatActivity(), ItemClicked {
         //if it is paused midway through a song
         else if(!isPlaying && songPercent > 0){
             //resources.getDrawable(R.drawable.ic_pause, null
-            play_button.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null))
+            playButton.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_pause, null))
             isPlaying = true
 
             //pause keeps the position in the player so we can just start
@@ -276,12 +288,12 @@ class MusicPlayerActivity : AppCompatActivity(), ItemClicked {
                         val playerPosition = mediaPlayer?.currentPosition!! / 1000
                         val totalDuration = mediaPlayer?.duration!! / 1000
 
-                        seek_bar.max = totalDuration
-                        seek_bar.progress = playerPosition
+                        seekbar.max = totalDuration
+                        seekbar.progress = playerPosition
 
 
-                        time_elapsed_text_view.text = timerFormat(playerPosition.toLong())
-                        time_remaining_text_view.text = timerFormat((totalDuration - playerPosition).toLong())
+                        timeElapsedTextView.text = timerFormat(playerPosition.toLong())
+                        timeRemainingTextView.text = timerFormat((totalDuration - playerPosition).toLong())
 
                         mHandler.postDelayed(this, 1000)
 
@@ -340,11 +352,11 @@ class MusicPlayerActivity : AppCompatActivity(), ItemClicked {
         linearLayoutManager = LinearLayoutManager(this)
         adapter = MusicListAdapter(musicList, this)
 
-        recycler_view.layoutManager = linearLayoutManager
-        recycler_view.adapter = adapter
+        recyclerView.layoutManager = linearLayoutManager
+        recyclerView.adapter = adapter
 
         if(musicList.size == 0){
-            Snackbar.make(card_view, "No music found on external storage", Snackbar.LENGTH_LONG)
+            Snackbar.make(cardView, "No music found on external storage", Snackbar.LENGTH_LONG)
                 .show()
         }
 
